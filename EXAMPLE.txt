@@ -1,0 +1,45 @@
+Example on adding more chains
+
+In qb-core/shared/items.lua add this
+['']  					= {['name'] = '', 			['label'] = '',		['weight'] = 1,  		['type'] = 'item',  	['image'] = 'chain.png',  			['unique'] = true,  	['useable'] = true,  	['shouldClose'] = true,  	['combinable'] = nil, 	['description'] = ''},
+
+
+in qb-chains/client.lua add this
+RegisterNetEvent('chains:client:*event_name_here*', function(itemName)
+    if not wearing then
+        TriggerEvent('animations:client:EmoteCommandStart', {"adjusttie"})
+        QBCore.Functions.Progressbar("chain_misc", "Putting on chain..", 3000, false, true, {
+        
+            disableMovement = false,
+            disableCarMovement = false,
+            disableMouse = false,
+            disableCombat = true,
+        }, {}, {}, {}, function() -- Done
+            SetPedComponentVariation(ped, 7, 10, GetPedTextureVariation(ped, 7), 15) --- 7 is for neck accessories(teef) the 10 is for number chain and 15 is for number texture
+            wearing = true
+            
+            TriggerEvent('animations:client:EmoteCommandStart', {"c"})
+        end)
+    else
+        TriggerEvent('animations:client:EmoteCommandStart', {"adjusttie"})
+        QBCore.Functions.Progressbar("chain_misc", "Taking off chain..", 3000, false, true, {
+            disableMovement = false,
+            disableCarMovement = false,
+            disableMouse = false,
+            disableCombat = true,
+        }, {}, {}, {}, function() -- Done
+            SetPedComponentVariation(ped, 7, 0)
+            wearing = false
+            
+            TriggerEvent('animations:client:EmoteCommandStart', {"c"})
+        end)
+    end
+end)
+
+
+in qb-chains/server.lua add this
+QBCore.Functions.CreateUseableItem("*item_name_here*", function(source, item)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    TriggerClientEvent("chains:client:*name_of_event_here*", src, item.name)
+end)
