@@ -34,6 +34,7 @@ CreateThread(function()
     end
 end)
 RegisterNetEvent('chains:client:event_name_here', function(itemName)
+    local ped = PlayerPedId()
     if not wearing32 then
         wearing32 = true
         TriggerEvent('animations:client:EmoteCommandStart', {"adjusttie"})
