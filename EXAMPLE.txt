@@ -5,15 +5,15 @@ In qb-core/shared/items.lua add this
 
 
 in qb-chains/client.lua add this
-local wearing = false   -- After wearing add a number to represent the chain make sure each chain has a different number (wearing32 is the next one)
+local wearing32 = false   -- After wearing add a number to represent the chain make sure each chain has a different number (wearing32 is the next one)
 CreateThread(function()
     while true do
         local sleep = 5000 -- If you want chain taken off quicker when item drop or removed change this number
 		if LocalPlayer.state.isLoggedIn then
-            QBCore.Functions.TriggerCallback('qb-chains:server:*event_name_here*', function(HasItem)
+            QBCore.Functions.TriggerCallback('qb-chains:server:event_name_here', function(HasItem)
                 if not HasItem then
-                    if wearing then
-                        wearing = false
+                    if wearing32 then
+                        wearing32 = false
                         TriggerEvent('animations:client:EmoteCommandStart', {"adjusttie"})
                         QBCore.Functions.Progressbar("chain_misc", "Taking off chain..", 3000, false, true, {
                             disableMovement = false,
@@ -33,23 +33,21 @@ CreateThread(function()
 		Wait(sleep)
     end
 end)
-RegisterNetEvent('chains:client:*event_name_here*', function(itemName)
-    if not wearing then
-        wearing = true
+RegisterNetEvent('chains:client:event_name_here', function(itemName)
+    if not wearing32 then
+        wearing32 = true
         TriggerEvent('animations:client:EmoteCommandStart', {"adjusttie"})
         QBCore.Functions.Progressbar("chain_misc", "Putting on chain..", 3000, false, true, {
-        
             disableMovement = false,
             disableCarMovement = false,
             disableMouse = false,
             disableCombat = true,
         }, {}, {}, {}, function() -- Done
-            SetPedComponentVariation(ped, 7, 10, GetPedTextureVariation(ped, 7), 15) --- 7 is for neck accessories(teef) the 10 is for number chain and 15 is for number texture
-            
+            SetPedComponentVariation(ped, 7, 10)
             TriggerEvent('animations:client:EmoteCommandStart', {"c"})
         end)
-    elseif wearing then
-        wearing = false
+    elseif wearing32 then
+        wearing32 = false
         TriggerEvent('animations:client:EmoteCommandStart', {"adjusttie"})
         QBCore.Functions.Progressbar("chain_misc", "Taking off chain..", 3000, false, true, {
             disableMovement = false,
@@ -64,17 +62,17 @@ RegisterNetEvent('chains:client:*event_name_here*', function(itemName)
 end)
 
 in qb-chains/server.lua add this
-QBCore.Functions.CreateCallback('qb-chains:server:*event_name_here*', function(source, cb)
+QBCore.Functions.CreateCallback('qb-chains:server:event_name_here', function(source, cb)
     local Player = QBCore.Functions.GetPlayer(source)
-    local Item = Player.Functions.GetItemByName("*item_name_here*")
+    local Item = Player.Functions.GetItemByName("item_name_here")
     if Item ~= nil then
         cb(true)
     else
         cb(false)
     end
 end)
-QBCore.Functions.CreateUseableItem("*item_name_here*", function(source, item)
+QBCore.Functions.CreateUseableItem("item_name_here", function(source, item)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    TriggerClientEvent("chains:client:*name_of_event_here*", src, item.name)
+    TriggerClientEvent("chains:client:name_of_event_here", src, item.name) -- Event name that triggers the putting on of the chain
 end)
